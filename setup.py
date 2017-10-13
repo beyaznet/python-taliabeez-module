@@ -2,9 +2,9 @@ from setuptools import setup
 
 setup(
     name='taliabeez',
-    version='0.1.1',
+    version='0.1.2',
     packages=['taliabeez'],
-    description='Python TaliaBee ZigBee interface',
+    description='TaliaBee ZigBee interface',
     url = 'https://github.com/beyaznet/python-taliabeez-module',
     author = 'Beyaz R&D Team',
     author_email = 'arge@beyaz.net',
