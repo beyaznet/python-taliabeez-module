@@ -1,7 +1,6 @@
 import re
 from taliabeeio import TaliaBeeIO
 from xbee import ZigBee
-from pprint import pprint
 
 DATA_PATTERN = re.compile('([0-9]+)\|([CNR])\|(.*)')
 COMMAND_PATTERN = re.compile('([ADR])([0-9]{2})([0-9]+)')
@@ -36,7 +35,6 @@ class TaliaBeeZ(object):
         return self._zigbee.tx(dest_addr_long=addr, data=bytes(data, 'utf-8'))
 
     def process_data(self, data):
-        pprint(data)
         if data['id'] == 'rx_explicit':
             try:
                 received_data = self.parse_raw_data(data['rf_data'].decode())
@@ -44,7 +42,6 @@ class TaliaBeeZ(object):
                 response = self.generate_raw_data(received_data['msg_id'],
                                                   'R', response_data)
                 self.send(addr=data['source_addr_long'], data=response)
-                #self._zigbee.tx(dest_addr_long=b'\x00\x13\xa2\x00@\xe2\x9a#', data=b'ljljljlj')
 
             except Exception as e:
                 print('err', str(e))
@@ -82,11 +79,17 @@ class TaliaBeeZ(object):
             elif output_type == 'A':
                 setattr(self.io_controller, 'ao' + str(pin), val)
         status = self.io_controller.status
-        di_values = ''.join([str(status['di'][str(di)]) for di in range(1, 17)])
-        do_values = ''.join([str(status['do'][str(do)]) for do in range(1, 13)])
-        ro_values = ''.join([str(status['ro'][str(ro)]) for ro in range(13, 17)])
-        ai_values = ''.join([str(status['ai'][str(ai)]).zfill(4) for ai in range(1, 5)])
-        ao_values = ''.join([str(status['ao'][str(ao)]).zfill(4) for ao in range(1, 5)])
-        r1 = ','.join((di_values, do_values + ro_values, ai_values, ao_values))
-        print(r1)
+        di_values = ''.join([str(status['di'][str(di)])
+                             for di in range(1, 17)])
+        do_values = ''.join([str(status['do'][str(do)])
+                             for do in range(1, 13)])
+        ro_values = ''.join([str(status['ro'][str(ro)])
+                             for ro in range(13, 17)])
+        ai_values = ''.join([str(status['ai'][str(int(ai))]).zfill(4)
+                             for ai in range(1, 5)])
+        ao_values = ''.join([str(status['ao'][str(int(ao))]).zfill(4)
+                             for ao in range(1, 5)])
+        temp = str(status['temperature'])
+        r1 = ','.join((di_values, do_values + ro_values,
+                       ai_values, ao_values, temp))
         return r1
