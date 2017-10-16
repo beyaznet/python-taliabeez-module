@@ -4,7 +4,6 @@ TaliaBeeZ is the ZigBee interface to [TaliaBee](https://github.com/beyaznet/Tali
 
 Table of contents
 =================
-
 - [About](#about)
 - [Requirements](#requirements)
 - [Installation](#installation)
@@ -30,7 +29,6 @@ pip3 install taliabeez
 
 How to use
 ==========
-
 In order to use ZigBee interface, you need to set your ZigBees to `API` mode.
 And preferably, set your ZigBee Routers' `DL` and `DH` adresses to the broadcast adress of the network.
 
@@ -41,11 +39,9 @@ You will send a string and receive a string with the same format. The string sho
 Each field has a format, too.
 
 #### ID Format
-
-`ID` is an integer value between `1` and `9999`. This value is used to create request/response pairs.
+`ID` is an integer value between `0` and `9999`. This value is used to create request/response pairs.
 
 #### TYPE Format
-
 `TYPE` field specifies the data is a command or a reply for a command. `C` for command, `R` for reply.
 There is no use of `R` while sending a command. You should probably use `C` value.
 
@@ -59,36 +55,39 @@ There is no use of `R` while sending a command. You should probably use `C` valu
 - `AXXYYYY`: Write `YYYY` to the `XX`th analog output. `XX` is a right-aligned integer with two digits `[0-4]`, `YYYY` is a right-aligned integer with 4 digits `[0-4095]`
 
 ### Response
-
-For every sent command list -even if it's empty- values of the all inputs will be sent as response. There is a format for that, too.
+For every sent command list (even if it's empty), the values of the all I/O will be sent as response. There is a format for that, too.
 
 Format : `ID|R|dddddddddddddddd,DDDDDDDDDDDDRRRR,aaaa,AAAA,T`
 
-`d`: Digital Input. You'll see the status of a digital input here.
-`D`: Digital Output. You'll see the status of a digital output here.
-`R`: Relay Output. You'll see the status of a relay here.
-`a`: Analog Input. You'll see the status of a analog input here.
-`A`: Analog Output. You'll see the status of a analog output here.
-`T`: Temperature. You'll see a floating number here. (contains 5-6 characters)
+- `d`: Digital Input. You'll see the status of a digital input here.
+
+- `D`: Digital Output. You'll see the status of a digital output here.
+
+- `R`: Relay Output. You'll see the status of a relay here.
+
+- `a`: Analog Input. You'll see the status of a analog input here.
+
+- `A`: Analog Output. You'll see the status of a analog output here.
+
+- `T`: Temperature. You'll see a floating number here. (contains 5-6 characters)
 
 Here you can see the the status of every single component.
 
 ### Examples
-
 Here are the examples for this format:
 
 > `9|C|R010001`
 
-  This is the package with the id `9`
+  This is the package with ID `9`
 
   This package contains commands.
 
-  The command is `R011` means "Write 1 to relay output 1". (Set it)
+  The command is `R011` means "Write 1 to relay output #01". (Set it)
 
 
-> `154|R|0000000100000000,1000000000001000,1263345619821746,0000000000000000,-2.75`
+> `9|R|0000000100000000,1000000000001000,1263345619821746,1000200030004000,-2.75`
 
-  This is the response for the package with id = `9`
+  This is the response for the package with ID `9`
 
   This data contains a reply for your command list that you've sent before.
 
@@ -96,16 +95,16 @@ Here are the examples for this format:
 
   All digital outputs and relays are in `1000000000001000`.
 
-  All analog inputs are in `1263345619826174`.
+  All analog inputs are in `1263345619821746`.
 
   First Analog Input is `1263`.
 
-  Second Analog Input is EDD `3456`.
+  Second Analog Input is `3456`.
 
-  Third Analog Input is CCB `1982`.
+  Third Analog Input is `1982`.
 
-  Fourth Analog Input is BAA `1746`.
+  Fourth Analog Input is `1746`.
 
-  All analog outputs are in `0000000000000000`.
+  All analog outputs are in `1000200030004000`.
 
   Temperature is -2.75
