@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='taliabeez',
-    version='0.1.3',
+    version='0.1.4',
     packages=['taliabeez'],
     description='TaliaBee ZigBee interface',
     url = 'https://github.com/beyaznet/python-taliabeez-module',

@@ -1,9 +1,12 @@
 import re
 from taliabeeio import TaliaBeeIO
 from xbee import ZigBee
+from pprint import pprint
+from time import sleep
 
 DATA_PATTERN = re.compile('([0-9]+)\|([CNR])\|(.*)')
 COMMAND_PATTERN = re.compile('([ADR])([0-9]{2})([0-9]+)')
+SLEEP_PATTERN = re.compile('S([0-9]{1,2}(\.[0-9])?)')
 
 
 class TaliaBeeZ(object):
@@ -35,6 +38,7 @@ class TaliaBeeZ(object):
         return self._zigbee.tx(dest_addr_long=addr, data=bytes(data, 'utf-8'))
 
     def process_data(self, data):
+        pprint(data)
         if data['id'] == 'rx_explicit':
             try:
                 received_data = self.parse_raw_data(data['rf_data'].decode())
@@ -64,20 +68,23 @@ class TaliaBeeZ(object):
     def data_handler(self, message):
         commands = message.split(',')
         for c in commands:
-            m = COMMAND_PATTERN.match(c)
-            if not m:
-                continue
-            output_type, pin, val = m.groups()
-            val = int(val)
-            pin = int(pin)
-            if output_type == 'D':
-                setattr(self.io_controller, 'do' + str(pin), val)
-            elif output_type == 'R':
-                pin += 12
-                setattr(self.io_controller, 'ro' + str(pin), val)
+            # Is that a command?
+            mc, ms = COMMAND_PATTERN.match(c), SLEEP_PATTERN.match(c)
+            if mc:
+                output_type, pin, val = mc.groups()
+                val = int(val)
+                pin = int(pin)
+                if output_type == 'D':
+                    setattr(self.io_controller, 'do' + str(pin), val)
+                elif output_type == 'R':
+                    pin += 12
+                    setattr(self.io_controller, 'ro' + str(pin), val)
 
-            elif output_type == 'A':
-                setattr(self.io_controller, 'ao' + str(pin), val)
+                elif output_type == 'A':
+                    setattr(self.io_controller, 'ao' + str(pin), val)
+            elif ms:
+                sleep(float(ms.groups()[0]))
+
         status = self.io_controller.status
         di_values = ''.join([str(status['di'][str(di)])
                              for di in range(1, 17)])
